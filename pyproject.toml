@@ -1,0 +1,7 @@
+[project]
+name = "fiap-tech-challenge-fase-2"
+version = "0.1.0"
+description = "Tech challenge da fase 2 da pós tech em Engenharia de Machine Learning da FIAP"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
