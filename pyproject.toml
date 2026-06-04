@@ -13,10 +13,15 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "ipykernel>=7.2.0",
     "pre-commit>=4.6.0",
     "pytest>=9.0.3",
     "ruff>=0.15.15",
+    "taskipy>=1.14.1",
 ]
+
+[tool.taskipy.tasks]
+test = "pytest tests/ -v"
 
 [[tool.uv.index]]
 name = "pytorch-cpu"
