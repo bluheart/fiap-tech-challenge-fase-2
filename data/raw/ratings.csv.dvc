@@ -1,0 +1,5 @@
+outs:
+- md5: ca047f0e4676e08cf455469346bb4512
+  size: 2475052
+  hash: md5
+  path: ratings.csv
