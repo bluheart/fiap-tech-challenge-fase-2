@@ -5,15 +5,45 @@ import pandas as pd
 
 
 class GradientBoostingFeatureEng(FeatureEngineer):
-    """Feature engineering for Gradient Boosting model"""
+    """Feature engineering for Gradient Boosting model.
+
+    This class implements feature engineering specifically designed for gradient
+    boosting models, including temporal patterns, user preferences, genre features,
+    and statistical aggregations.
+
+    Attributes:
+        random_state (int): Random seed for reproducibility.
+        encoders (dict): Dictionary storing fitted statistics and encoders.
+    """
 
     def __init__(self, random_state: int = 42):
+        """Initialize the Gradient Boosting feature engineer.
+
+        Args:
+            random_state (int, optional): Random seed for reproducibility.
+                Defaults to 42.
+        """
         super().__init__()
         self.random_state = random_state
 
     def fit(self, df: pd.DataFrame) -> Self:
-        """Fit feature engineering by computing and storing statistics"""
+        """Fit feature engineering by computing and storing statistics.
 
+        Computes all necessary statistics from the training data including user
+        temporal patterns, genre preferences, movie popularity, and user activity.
+        These statistics are stored in self.encoders for use during transform.
+
+        Args:
+            df (pd.DataFrame): Input DataFrame containing user ratings and
+                metadata. Must include columns: userId, movieId, rating,
+                timestamp, and optionally genres and movie_year.
+
+        Returns:
+            Self: Returns self for method chaining.
+
+        Raises:
+            KeyError: If required columns are missing from the DataFrame.
+        """
         # Compute and store statistics for transformation
         self._compute_statistics(df)
 
@@ -24,7 +54,23 @@ class GradientBoostingFeatureEng(FeatureEngineer):
         return self
 
     def transform(self, df: pd.DataFrame) -> Tuple[np.ndarray, pd.Series]:
-        """Transform DataFrame into feature matrix and target vector"""
+        """Transform DataFrame into feature matrix and target vector.
+
+        Applies the fitted feature engineering transformations to new data.
+        Must be called after fit().
+
+        Args:
+            df (pd.DataFrame): Input DataFrame to transform. Must contain
+                the same columns as the DataFrame used in fit().
+
+        Returns:
+            Tuple[np.ndarray, pd.Series]: A tuple containing:
+                - X (np.ndarray): Feature matrix with all engineered features.
+                - y (pd.Series): Target values (rating column).
+
+        Raises:
+            KeyError: If transform is called before fit().
+        """
         if not self.encoders:
             raise KeyError("Trying to transform without fit")
 
@@ -33,7 +79,23 @@ class GradientBoostingFeatureEng(FeatureEngineer):
         return X.values, y
 
     def _compute_statistics(self, df: pd.DataFrame) -> None:
-        """Compute and store all statistics needed for feature engineering"""
+        """Compute and store all statistics needed for feature engineering.
+
+        Calculates and stores various statistics in self.encoders including:
+            - User temporal patterns (day of week and month averages)
+            - User genre preferences
+            - Movie popularity (number of ratings)
+            - User activity (number of ratings)
+            - User and movie rating statistics (mean and std)
+
+        All computed statistics are stored in self.encoders dictionary for
+        later use in feature engineering.
+
+        Args:
+            df (pd.DataFrame): Input DataFrame containing user ratings and
+                metadata. Must include userId, movieId, rating, timestamp,
+                and optionally genres columns.
+        """
 
         df = df.copy()
         df["timestamp"] = pd.to_datetime(df["timestamp"], unit="s")
@@ -110,7 +172,29 @@ class GradientBoostingFeatureEng(FeatureEngineer):
         )
 
     def _engineer_features(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Create all features for the model"""
+        """Create all features for the model.
+
+        Applies feature engineering transformations to the input DataFrame
+        using statistics stored in self.encoders from fit(). Creates features
+        including:
+            - Time-based features (month, day, hour, dayofweek, quarter, year)
+            - Movie age (if movie_year available)
+            - User temporal patterns (from precomputed statistics)
+            - Rolling statistics (user's recent rating trends)
+            - Genre one-hot encoding
+            - User genre preferences
+            - Movie popularity and user activity
+            - Basic user and movie rating statistics
+
+        Args:
+            df (pd.DataFrame): Input DataFrame to engineer features for.
+                Must contain userId, movieId, rating, timestamp, and
+                optionally genres and movie_year.
+
+        Returns:
+            pd.DataFrame: DataFrame containing only the engineered feature
+                columns, with all missing values filled with 0.
+        """
         df = df.copy()
 
         # Feature 1: Time-based features

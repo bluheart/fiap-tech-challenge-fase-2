@@ -6,12 +6,50 @@ import pandas as pd
 
 
 class RandomForestFeatureEng(FeatureEngineer):
-    def __init__(self, n_svd_components: int = 20, random_state: int = 42):
+    """Feature engineering for Random Forest model.
+
+    This class implements feature engineering specifically designed for random
+    forest models, incorporating collaborative filtering via SVD, user and movie
+    statistics, genre features, and rating deviations.
+
+    Attributes:
+        n_svd_components (int): Number of latent factors for SVD decomposition.
+        random_state (int): Random seed for reproducibility.
+        encoders (dict): Dictionary storing fitted statistics, SVD model, and
+            factor mappings.
+    """
+
+    def __init__(self, n_svd_components: int = 20, random_state: int = 42) -> None:
+        """Initialize the Random Forest feature engineer.
+
+        Args:
+            n_svd_components (int, optional): Number of latent factors to
+                extract using Truncated SVD. Defaults to 20.
+            random_state (int, optional): Random seed for reproducibility.
+                Defaults to 42.
+        """
         super().__init__()
         self.n_svd_components = n_svd_components
         self.random_state = random_state
 
     def fit(self, df: pd.DataFrame) -> Self:
+        """Fit feature engineering by computing statistics and SVD factors.
+
+        Fits a Truncated SVD model on the user-movie rating matrix and computes
+        user and movie statistics. All fitted components are stored in
+        self.encoders for use during transform.
+
+        Args:
+            df (pd.DataFrame): Input DataFrame containing user ratings and
+                metadata. Must include columns: userId, movieId, rating,
+                timestamp, and genres.
+
+        Returns:
+            Self: Returns self for method chaining.
+
+        Raises:
+            ValueError: If required columns are missing or SVD fails to fit.
+        """
         # Fit SVD on the full dataset
         user_movie_matrix = df.pivot_table(
             values="rating", index="userId", columns="movieId", fill_value=0
@@ -39,6 +77,23 @@ class RandomForestFeatureEng(FeatureEngineer):
         return self
 
     def transform(self, df: pd.DataFrame) -> Tuple[np.ndarray, pd.Series]:
+        """Transform DataFrame into feature matrix and target vector.
+
+        Applies the fitted feature engineering transformations to new data.
+        Must be called after fit().
+
+        Args:
+            df (pd.DataFrame): Input DataFrame to transform. Must contain
+                the same columns as the DataFrame used in fit().
+
+        Returns:
+            Tuple[np.ndarray, pd.Series]: A tuple containing:
+                - X (np.ndarray): Feature matrix with all engineered features.
+                - y (pd.Series): Target values (rating column).
+
+        Raises:
+            KeyError: If transform is called before fit().
+        """
         if not self.encoders:
             raise KeyError("Trying to transform without fit")
         X = self._engineer_features(df)
@@ -46,6 +101,17 @@ class RandomForestFeatureEng(FeatureEngineer):
         return X.values, y
 
     def _compute_statistics(self, df: pd.DataFrame) -> None:
+        """Compute and store user and movie statistics.
+
+        Calculates and stores various statistics in self.encoders including:
+            - User statistics: average rating, rating count, rating standard deviation
+            - Movie statistics: average rating, rating count, rating standard deviation
+            - Feature columns: list of all engineered feature names
+
+        Args:
+            df (pd.DataFrame): Input DataFrame containing user ratings.
+                Must include userId, movieId, and rating columns.
+        """
         # User statistics
         user_stats = (
             df.groupby("userId")["rating"].agg(["mean", "count", "std"]).fillna(0)
@@ -69,6 +135,26 @@ class RandomForestFeatureEng(FeatureEngineer):
         self.encoders["feature_columns"] = df_with_features.columns.tolist()
 
     def _engineer_features(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Create all features for the model.
+
+        Applies feature engineering transformations to the input DataFrame
+        using statistics and SVD factors stored in self.encoders from fit().
+        Creates features including:
+            - User statistics (average, count, standard deviation)
+            - Movie statistics (average, count, standard deviation)
+            - SVD latent features (collaborative filtering factors)
+            - Genre one-hot encoding
+            - Genre count
+            - Rating deviation features (from user/movie averages)
+
+        Args:
+            df (pd.DataFrame): Input DataFrame to engineer features for.
+                Must contain userId, movieId, rating, and genres columns.
+
+        Returns:
+            pd.DataFrame: DataFrame containing only the engineered feature
+                columns, with all missing values filled with 0.
+        """
         df = df.copy()
 
         # Feature 1: User statistics
