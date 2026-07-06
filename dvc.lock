@@ -1,0 +1,41 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: python src/pipeline/preprocess.py
+    deps:
+    - path: data/raw/movies.csv
+      hash: md5
+      md5: bcd7efa855fccecc024b09ebc4423fa8
+      size: 515699
+    - path: data/raw/ratings.csv
+      hash: md5
+      md5: ca047f0e4676e08cf455469346bb4512
+      size: 2475052
+    - path: src/features/baseline_preprocessor/
+      hash: md5
+      md5: b393172dd813a6d55f5ef72b5f653814.dir
+      size: 11057
+      nfiles: 8
+    - path: src/pipeline/preprocess.py
+      hash: md5
+      md5: fd361c2bcdd4eadaec080569dcc219dc
+      size: 1497
+    params:
+      params.yaml:
+        preprocessors:
+          gradient_boosting: true
+          linear_regression: true
+          random_forest: true
+    outs:
+    - path: data/processed/gradient_boosting_data.csv
+      hash: md5
+      md5: 03471a3498275fedd0f1b788ca95921f
+      size: 4575819
+    - path: data/processed/linear_regression_data.csv
+      hash: md5
+      md5: 03471a3498275fedd0f1b788ca95921f
+      size: 4575819
+    - path: data/processed/random_forest_data.csv
+      hash: md5
+      md5: 03471a3498275fedd0f1b788ca95921f
+      size: 4575819

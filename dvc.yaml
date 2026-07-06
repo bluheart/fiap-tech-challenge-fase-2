@@ -1,0 +1,14 @@
+stages:
+  preprocess:
+    cmd: python src/pipeline/preprocess.py
+    deps:
+      - src/pipeline/preprocess.py
+      - src/features/baseline_preprocessor/
+      - data/raw/ratings.csv
+      - data/raw/movies.csv
+    params:
+      - preprocessors
+    outs:
+      - data/processed/gradient_boosting_data.csv
+      - data/processed/linear_regression_data.csv
+      - data/processed/random_forest_data.csv
