@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 
-class LinerRegressionFeatureEng(FeatureEngineer):
+class LinearRegressionFeatureEng(FeatureEngineer):
     """Feature engineering class for Linear Regression model.
 
     This class handles feature engineering including polynomial features,

@@ -1,7 +1,7 @@
 from .baseline_feature_engineering import (
     GradientBoostingFeatureEng,
     RandomForestFeatureEng,
-    LinerRegressionFeatureEng,
+    LinearRegressionFeatureEng,
 )
 from .baseline_preprocessor import (
     GradientBoostingPreprocessor,
@@ -14,7 +14,7 @@ from .baseline_preprocessor import (
 __all__ = [
     "GradientBoostingFeatureEng",
     "RandomForestFeatureEng",
-    "LinerRegressionFeatureEng",
+    "LinearRegressionFeatureEng",
     "GradientBoostingPreprocessor",
     "RandomForestPreprocessor",
     "LinearRegressionPreprocessor",

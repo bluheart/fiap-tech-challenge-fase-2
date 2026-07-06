@@ -18,10 +18,14 @@ stages:
       nfiles: 8
     - path: src/pipeline/preprocess.py
       hash: md5
-      md5: fd361c2bcdd4eadaec080569dcc219dc
-      size: 1497
+      md5: 1a12ebbee0209fc38c0aa6955fd9cb15
+      size: 1484
     params:
       params.yaml:
+        features_eng:
+          gradient_boosting: true
+          linear_regression: true
+          random_forest: true
         preprocessors:
           gradient_boosting: true
           linear_regression: true
@@ -39,3 +43,46 @@ stages:
       hash: md5
       md5: 03471a3498275fedd0f1b788ca95921f
       size: 4575819
+  feature_engineering:
+    cmd: python src/pipeline/feature_eng.py
+    deps:
+    - path: data/processed/gradient_boosting_data.csv
+      hash: md5
+      md5: 03471a3498275fedd0f1b788ca95921f
+      size: 4575819
+    - path: data/processed/linear_regression_data.csv
+      hash: md5
+      md5: 03471a3498275fedd0f1b788ca95921f
+      size: 4575819
+    - path: data/processed/random_forest_data.csv
+      hash: md5
+      md5: 03471a3498275fedd0f1b788ca95921f
+      size: 4575819
+    - path: src/features/baseline_feature_engineering/
+      hash: md5
+      md5: e1c5bc939b3d7f270f10e508171b45e6.dir
+      size: 54988
+      nfiles: 8
+    - path: src/pipeline/feature_eng.py
+      hash: md5
+      md5: 98207c9089341981f1d7f17601d540c6
+      size: 1656
+    params:
+      params.yaml:
+        features_eng:
+          gradient_boosting: true
+          linear_regression: true
+          random_forest: true
+    outs:
+    - path: data/features/gradient_boosting_features.csv
+      hash: md5
+      md5: b6577eeaa826ae52c222a4e80dc428ff
+      size: 75083858
+    - path: data/features/linear_regression_features.csv
+      hash: md5
+      md5: 368103c04e94735d76c60e5fc84ba350
+      size: 872793407
+    - path: data/features/random_forest_features.csv
+      hash: md5
+      md5: 45261e698ba4ff22981c3f23b05bef95
+      size: 106275410

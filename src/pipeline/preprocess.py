@@ -1,4 +1,4 @@
-# src/preprocess.py (with parameter control)
+# src/pipeline/preprocess.py (with parameter control)
 import pandas as pd
 from pathlib import Path
 import yaml
