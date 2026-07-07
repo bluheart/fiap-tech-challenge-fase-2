@@ -1,0 +1,55 @@
+# Data preprocessing
+preprocessors:
+  gradient_boosting: true
+  linear_regression: true
+  random_forest: true
+
+# Feature engineering
+features_eng:
+  gradient_boosting: true
+  linear_regression: true
+  random_forest: true
+
+# Model training
+models:
+  gradient_boosting: true
+  linear_regression: true
+  random_forest: true
+
+# Training parameters
+train:
+  test_size: 0.2
+  random_state: 42
+
+# MLflow configuration
+mlflow:
+  tracking_uri: "sqlite:///mlflow.db"
+  experiment_name: "movie_rating_prediction"
+  evaluation_run_name: null  # Auto-generates if null
+
+# Evaluation parameters
+evaluate:
+  test_size: 0.2
+  random_state: 42
+
+# Model-specific parameters
+linear_regression_params: {}
+
+random_forest_params:
+  n_estimators: 100
+  max_depth: 15
+  min_samples_split: 5
+  min_samples_leaf: 2
+  max_features: "sqrt"
+  random_state: 42
+  n_jobs: -1
+
+gradient_boosting_params:
+  n_estimators: 150
+  learning_rate: 0.05
+  max_depth: 6
+  min_samples_split: 10
+  min_samples_leaf: 4
+  subsample: 0.8
+  max_features: 0.8
+  random_state: 42

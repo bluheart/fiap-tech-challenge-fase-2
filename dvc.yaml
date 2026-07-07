@@ -1,0 +1,73 @@
+stages:
+  preprocess:
+    cmd: python src/pipeline/preprocess.py
+    deps:
+      - src/pipeline/preprocess.py
+      - src/features/baseline_preprocessor/
+      - data/raw/ratings.csv
+      - data/raw/movies.csv
+    params:
+      - preprocessors
+      - features_eng
+    outs:
+      - data/processed/gradient_boosting_data.csv
+      - data/processed/linear_regression_data.csv
+      - data/processed/random_forest_data.csv
+
+  feature_engineering:
+    cmd: python src/pipeline/feature_eng.py
+    deps:
+      - src/pipeline/feature_eng.py
+      - src/features/baseline_feature_engineering/
+      - data/processed/gradient_boosting_data.csv
+      - data/processed/linear_regression_data.csv
+      - data/processed/random_forest_data.csv
+    params:
+      - features_eng
+    outs:
+      - data/features/gradient_boosting_features.csv
+      - data/features/linear_regression_features.csv
+      - data/features/random_forest_features.csv
+  
+  train:
+    cmd: python src/pipeline/train.py
+    deps:
+      - src/pipeline/train.py
+      - src/models/base.py
+      - src/models/factory.py
+      - data/features/gradient_boosting_features.csv
+      - data/features/linear_regression_features.csv
+      - data/features/random_forest_features.csv
+    params:
+      - models
+      - train
+      - mlflow
+      - linear_regression_params
+      - random_forest_params
+      - gradient_boosting_params
+    outs:
+      - models/gradient_boosting_model.pkl
+      - models/linear_regression_model.pkl
+      - models/random_forest_model.pkl
+    metrics:
+      - metrics/train_metrics.json
+  
+  evaluate:
+    cmd: python src/pipeline/evaluate.py
+    deps:
+      - src/pipeline/evaluate.py
+      - models/gradient_boosting_model.pkl
+      - models/linear_regression_model.pkl
+      - models/random_forest_model.pkl
+      - data/features/gradient_boosting_features.csv
+      - data/features/linear_regression_features.csv
+      - data/features/random_forest_features.csv
+    params:
+      - models
+      - evaluate
+      - mlflow
+      - linear_regression_params
+      - random_forest_params
+      - gradient_boosting_params
+    metrics:
+      - metrics/evaluation_metrics.json
