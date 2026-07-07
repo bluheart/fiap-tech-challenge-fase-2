@@ -28,3 +28,46 @@ stages:
       - data/features/gradient_boosting_features.csv
       - data/features/linear_regression_features.csv
       - data/features/random_forest_features.csv
+  
+  train:
+    cmd: python src/pipeline/train.py
+    deps:
+      - src/pipeline/train.py
+      - src/models/base.py
+      - src/models/factory.py
+      - data/features/gradient_boosting_features.csv
+      - data/features/linear_regression_features.csv
+      - data/features/random_forest_features.csv
+    params:
+      - models
+      - train
+      - mlflow
+      - linear_regression_params
+      - random_forest_params
+      - gradient_boosting_params
+    outs:
+      - models/gradient_boosting_model.pkl
+      - models/linear_regression_model.pkl
+      - models/random_forest_model.pkl
+    metrics:
+      - metrics/train_metrics.json
+  
+  evaluate:
+    cmd: python src/pipeline/evaluate.py
+    deps:
+      - src/pipeline/evaluate.py
+      - models/gradient_boosting_model.pkl
+      - models/linear_regression_model.pkl
+      - models/random_forest_model.pkl
+      - data/features/gradient_boosting_features.csv
+      - data/features/linear_regression_features.csv
+      - data/features/random_forest_features.csv
+    params:
+      - models
+      - evaluate
+      - mlflow
+      - linear_regression_params
+      - random_forest_params
+      - gradient_boosting_params
+    metrics:
+      - metrics/evaluation_metrics.json

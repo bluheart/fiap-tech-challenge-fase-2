@@ -65,8 +65,8 @@ stages:
       nfiles: 8
     - path: src/pipeline/feature_eng.py
       hash: md5
-      md5: 98207c9089341981f1d7f17601d540c6
-      size: 1656
+      md5: e3c724331d15f6efebba3f4087452144
+      size: 1647
     params:
       params.yaml:
         features_eng:
@@ -86,3 +86,145 @@ stages:
       hash: md5
       md5: 45261e698ba4ff22981c3f23b05bef95
       size: 106275410
+  train:
+    cmd: python src/pipeline/train.py
+    deps:
+    - path: data/features/gradient_boosting_features.csv
+      hash: md5
+      md5: b6577eeaa826ae52c222a4e80dc428ff
+      size: 75083858
+    - path: data/features/linear_regression_features.csv
+      hash: md5
+      md5: 368103c04e94735d76c60e5fc84ba350
+      size: 872793407
+    - path: data/features/random_forest_features.csv
+      hash: md5
+      md5: 45261e698ba4ff22981c3f23b05bef95
+      size: 106275410
+    - path: src/models/base.py
+      hash: md5
+      md5: 14796c92567144d057fb23451f65e7c9
+      size: 11273
+    - path: src/models/factory.py
+      hash: md5
+      md5: 54221a2504ddfbc9079b8e30597b5073
+      size: 2664
+    - path: src/pipeline/train.py
+      hash: md5
+      md5: 7d5d39d86ebe17a27d4a1df3a3dd7b9a
+      size: 8781
+    params:
+      params.yaml:
+        gradient_boosting_params:
+          n_estimators: 150
+          learning_rate: 0.05
+          max_depth: 6
+          min_samples_split: 10
+          min_samples_leaf: 4
+          subsample: 0.8
+          max_features: 0.8
+          random_state: 42
+        linear_regression_params: {}
+        mlflow:
+          tracking_uri: sqlite:///mlflow.db
+          experiment_name: movie_rating_prediction
+          evaluation_run_name:
+        models:
+          gradient_boosting: true
+          linear_regression: true
+          random_forest: true
+        random_forest_params:
+          n_estimators: 100
+          max_depth: 15
+          min_samples_split: 5
+          min_samples_leaf: 2
+          max_features: sqrt
+          random_state: 42
+          n_jobs: -1
+        train:
+          test_size: 0.2
+          random_state: 42
+    outs:
+    - path: metrics/train_metrics.json
+      hash: md5
+      md5: df208b562297ffb29285888d76384418
+      size: 884
+    - path: models/gradient_boosting_model.pkl
+      hash: md5
+      md5: afb0aeb231a99d6eb7303eed6a9a14dd
+      size: 1163790
+    - path: models/linear_regression_model.pkl
+      hash: md5
+      md5: ad38b82c5349508ff261a9b5d4ee51cf
+      size: 6999
+    - path: models/random_forest_model.pkl
+      hash: md5
+      md5: 90d6bb7897fbf50be5ded3cd3bf27f85
+      size: 49084176
+  evaluate:
+    cmd: python src/pipeline/evaluate.py
+    deps:
+    - path: data/features/gradient_boosting_features.csv
+      hash: md5
+      md5: b6577eeaa826ae52c222a4e80dc428ff
+      size: 75083858
+    - path: data/features/linear_regression_features.csv
+      hash: md5
+      md5: 368103c04e94735d76c60e5fc84ba350
+      size: 872793407
+    - path: data/features/random_forest_features.csv
+      hash: md5
+      md5: 45261e698ba4ff22981c3f23b05bef95
+      size: 106275410
+    - path: models/gradient_boosting_model.pkl
+      hash: md5
+      md5: afb0aeb231a99d6eb7303eed6a9a14dd
+      size: 1163790
+    - path: models/linear_regression_model.pkl
+      hash: md5
+      md5: ad38b82c5349508ff261a9b5d4ee51cf
+      size: 6999
+    - path: models/random_forest_model.pkl
+      hash: md5
+      md5: 90d6bb7897fbf50be5ded3cd3bf27f85
+      size: 49084176
+    - path: src/pipeline/evaluate.py
+      hash: md5
+      md5: b53f388d644d24d17dcb62e9208f3e78
+      size: 13809
+    params:
+      params.yaml:
+        evaluate:
+          test_size: 0.2
+          random_state: 42
+        gradient_boosting_params:
+          n_estimators: 150
+          learning_rate: 0.05
+          max_depth: 6
+          min_samples_split: 10
+          min_samples_leaf: 4
+          subsample: 0.8
+          max_features: 0.8
+          random_state: 42
+        linear_regression_params: {}
+        mlflow:
+          tracking_uri: sqlite:///mlflow.db
+          experiment_name: movie_rating_prediction
+          evaluation_run_name:
+        models:
+          gradient_boosting: true
+          linear_regression: true
+          random_forest: true
+        random_forest_params:
+          n_estimators: 100
+          max_depth: 15
+          min_samples_split: 5
+          min_samples_leaf: 2
+          max_features: sqrt
+          random_state: 42
+          n_jobs: -1
+    outs:
+    - path: metrics/evaluation_metrics.json
+      hash: md5
+      md5: 90a70c1fc84fc7abb7b7818be82597de
+      size: 1652
