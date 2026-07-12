@@ -9,7 +9,6 @@ import numpy as np
 import numpy.typing as npt
 from sklearn.model_selection import train_test_split
 import mlflow
-import mlflow.sklearn
 from datetime import datetime
 
 sys.path.append(str(Path(__file__).parent.parent.parent))
@@ -52,14 +51,15 @@ def load_features_with_split(
     return X_train, X_test, y_train, y_test
 
 
-def save_model(model, name: str) -> None:
-    """Save trained model to disk."""
+def save_model(model, name: str) -> Path:
+    """Save trained model to disk and return the path."""
     model_path = Path(f"models/{name}_model.pkl")
     model_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(model_path, "wb") as f:
         pickle.dump(model, f)
     print(f"Saved {name} model to {model_path}")
+    return model_path
 
 
 def create_model_with_factory(name: str, params: Dict[str, Any]):
@@ -109,8 +109,9 @@ def log_model_to_mlflow(
     X_train_shape: Tuple[int, int],
     X_test_shape: Tuple[int, int],
     model_params: Dict[str, Any],
+    model_path: Path,
 ) -> None:
-    """Log model and parameters to MLflow."""
+    """Log model as pickle artifact and parameters to MLflow."""
 
     # Log general parameters with model-specific prefix
     mlflow.log_params(
@@ -139,21 +140,32 @@ def log_model_to_mlflow(
         }
     )
 
-    # Log the model
-    safe_name = name.replace("_", "-")
+    # Log the model pickle file as an artifact
     try:
-        mlflow.sklearn.log_model(  # type: ignore
-            sk_model=model.get_model(),
-            name=name,
-            registered_model_name=f"{safe_name}_model",
-        )
-        print(f"Logged {name} model to MLflow")
+        # Log the pickle file as an artifact
+        mlflow.log_artifact(str(model_path), artifact_path="models")
+        print(f"Logged {name} model pickle as artifact to MLflow")
+
+        # Also try to log as sklearn model for better MLflow UI integration
+        try:
+            mlflow.pyfunc.log_model(
+                python_model=model.get_model(),
+                artifact_path=f"sklearn_models/{name}",
+                registered_model_name=f"{name.replace('_', '-')}_model",
+            )
+            print(f"Logged {name} model as sklearn model to MLflow")
+        except Exception as e:
+            print(f"Warning: Could not log sklearn model: {e}")
+            # Continue with artifact logging only
+
     except Exception as e:
-        print(f"Warning: Could not register model: {e}")
-        mlflow.sklearn.log_model(  # type: ignore
-            sk_model=model.get_model(), artifact_path=f"models/{name}"
-        )
-        print(f"Logged {name} model to MLflow without registration")
+        print(f"Error logging {name} model to MLflow: {e}")
+        # Try alternative: log the entire models directory
+        try:
+            mlflow.log_artifacts("models", artifact_path="models")
+            print("Logged all models directory as artifacts")
+        except Exception as e2:
+            print(f"Error logging models directory: {e2}")
 
 
 def main():
@@ -173,6 +185,7 @@ def main():
 
     # Track training info
     training_info = {}
+    model_paths = {}  # Store model paths for artifact logging
 
     try:
         # Train models that are enabled
@@ -207,10 +220,11 @@ def main():
                 model.fit(X_train, y_train)
                 print("Model trained successfully")
 
-                # Save model
-                save_model(model, name)
+                # Save model and get the path
+                model_path = save_model(model, name)
+                model_paths[name] = model_path
 
-                # Log to MLflow
+                # Log to MLflow - with model pickle as artifact
                 log_model_to_mlflow(
                     model=model,
                     name=name,
@@ -218,6 +232,7 @@ def main():
                     X_train_shape=X_train.shape,
                     X_test_shape=X_test.shape,
                     model_params=model_params,
+                    model_path=model_path,
                 )
 
                 # Store training info
@@ -226,6 +241,7 @@ def main():
                     "test_samples": X_test.shape[0],
                     "train_features": X_train.shape[1],
                     "model_params": model_params,
+                    "model_path": str(model_path),
                     "status": "success",
                 }
 
@@ -262,6 +278,7 @@ def main():
             print(f"   Train samples: {info['train_samples']}")
             print(f"   Test samples: {info['test_samples']}")
             print(f"   Features: {info['train_features']}")
+            print(f"   Model saved at: {info.get('model_path', 'N/A')}")
 
     print("\nTraining complete!")
 
