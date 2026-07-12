@@ -10,6 +10,7 @@ from src.features import (
     GradientBoostingPreprocessor,
     LinearRegressionPreprocessor,
     RandomForestPreprocessor,
+    MLPModelPreprocessor,
 )
 
 
@@ -30,6 +31,7 @@ def main():
         "gradient_boosting": GradientBoostingPreprocessor,
         "linear_regression": LinearRegressionPreprocessor,
         "random_forest": RandomForestPreprocessor,
+        "multi_layer_perceptron": MLPModelPreprocessor,
     }
 
     # Only run preprocessors that are enabled in params

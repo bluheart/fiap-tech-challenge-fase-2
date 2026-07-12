@@ -9,6 +9,7 @@ from src.features import (
     GradientBoostingFeatureEng,
     LinearRegressionFeatureEng,
     RandomForestFeatureEng,
+    MLPFeatureEngineer,
 )
 
 
@@ -24,6 +25,7 @@ def main():
         "gradient_boosting": GradientBoostingFeatureEng,
         "linear_regression": LinearRegressionFeatureEng,
         "random_forest": RandomForestFeatureEng,
+        "multi_layer_perceptron": MLPFeatureEngineer,
     }
 
     for name, enabled in params["features_eng"].items():

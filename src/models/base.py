@@ -5,6 +5,7 @@ import numpy.typing as npt
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
 from sklearn.linear_model import LinearRegression
+import torch.nn as nn
 
 
 # Abstract Product
@@ -26,7 +27,7 @@ class ModelBase(ABC):
         Sets the model to None and is_trained to False, indicating
         that the model needs to be built and trained before use.
         """
-        self.model: Optional[Union[BaseEstimator, RegressorMixin]] = None
+        self.model: Optional[Union[BaseEstimator, RegressorMixin, nn.Sequential]] = None
         self.is_trained: bool = False
 
     @abstractmethod
@@ -87,7 +88,7 @@ class ModelBase(ABC):
             raise ValueError("Model must be trained before making predictions")
         return self.model.predict(X_test)  # type: ignore[union-attr]
 
-    def get_model(self) -> Union[BaseEstimator, RegressorMixin]:
+    def get_model(self) -> Union[BaseEstimator, RegressorMixin, nn.Sequential]:
         """Return the underlying scikit-learn model instance.
 
         Provides access to the raw scikit-learn model for advanced

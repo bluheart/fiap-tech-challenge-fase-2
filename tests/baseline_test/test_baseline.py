@@ -13,14 +13,14 @@ from src.features import (
     GradientBoostingPreprocessor,
 )
 from src.features import (
-    LinerRegressionFeatureEng,
+    LinearRegressionFeatureEng,
     RandomForestFeatureEng,
     GradientBoostingFeatureEng,
 )
 
 
-class TestLinerRegressionPreprocessor:
-    """Test suite for LinerRegressionPreprocessor"""
+class TestLinearRegressionPreprocessor:
+    """Test suite for LinearRegressionPreprocessor"""
 
     @pytest.fixture
     def sample_ratings_df(self):
@@ -103,8 +103,8 @@ class TestLinerRegressionPreprocessor:
         assert len(result) == 0
 
 
-class TestLinerRegressionFeatureEng:
-    """Test suite for LinerRegressionFeatureEng"""
+class TestLinearRegressionFeatureEng:
+    """Test suite for LinearRegressionFeatureEng"""
 
     @pytest.fixture
     def sample_df(self):
@@ -127,7 +127,7 @@ class TestLinerRegressionFeatureEng:
 
     def test_fit_creates_encoders(self, sample_df):
         """Test that fit creates polynomial and scaler encoders"""
-        feature_eng = LinerRegressionFeatureEng()
+        feature_eng = LinearRegressionFeatureEng()
         result = feature_eng.fit(sample_df)
 
         # Check that it returns self
@@ -145,7 +145,7 @@ class TestLinerRegressionFeatureEng:
 
     def test_transform_returns_correct_shape(self, sample_df):
         """Test that transform returns arrays of correct shape"""
-        feature_eng = LinerRegressionFeatureEng()
+        feature_eng = LinearRegressionFeatureEng()
         feature_eng.fit(sample_df)
 
         X, y = feature_eng.transform(sample_df)
@@ -158,7 +158,7 @@ class TestLinerRegressionFeatureEng:
 
     def test_transform_returns_scaled_features(self, sample_df):
         """Test that transform returns scaled features"""
-        feature_eng = LinerRegressionFeatureEng()
+        feature_eng = LinearRegressionFeatureEng()
         feature_eng.fit(sample_df)
 
         X, y = feature_eng.transform(sample_df)
@@ -172,7 +172,7 @@ class TestLinerRegressionFeatureEng:
 
     def test_engineer_features_creates_correct_columns(self, sample_df):
         """Test internal _engineer_features method"""
-        feature_eng = LinerRegressionFeatureEng()
+        feature_eng = LinearRegressionFeatureEng()
         result = feature_eng._engineer_features(sample_df)
 
         # Check that all expected feature columns are created
@@ -208,7 +208,7 @@ class TestLinerRegressionFeatureEng:
 
     def test_engineer_features_calculates_stats_correctly(self, sample_df):
         """Test that user and movie stats are calculated correctly"""
-        feature_eng = LinerRegressionFeatureEng()
+        feature_eng = LinearRegressionFeatureEng()
         result = feature_eng._engineer_features(sample_df)
 
         # Check user stats for userId=1 (ratings: 4.0, 5.0)
@@ -223,7 +223,7 @@ class TestLinerRegressionFeatureEng:
 
     def test_engineer_features_handles_timestamp_conversion(self, sample_df):
         """Test that timestamp is correctly converted to datetime features"""
-        feature_eng = LinerRegressionFeatureEng()
+        feature_eng = LinearRegressionFeatureEng()
         result = feature_eng._engineer_features(sample_df)
 
         # Check that timestamp features exist and are numeric
@@ -234,7 +234,7 @@ class TestLinerRegressionFeatureEng:
 
     def test_fit_transform_consistency(self, sample_df):
         """Test that fit and transform produce consistent results"""
-        feature_eng = LinerRegressionFeatureEng()
+        feature_eng = LinearRegressionFeatureEng()
         feature_eng.fit(sample_df)
 
         X1, y1 = feature_eng.transform(sample_df)
@@ -246,7 +246,7 @@ class TestLinerRegressionFeatureEng:
 
     def test_transform_requires_fit_first(self, sample_df):
         """Test that transform raises error if fit hasn't been called"""
-        feature_eng = LinerRegressionFeatureEng()
+        feature_eng = LinearRegressionFeatureEng()
 
         with pytest.raises(KeyError):
             feature_eng.transform(sample_df)
@@ -290,7 +290,7 @@ class TestIntegration:
         processed_df = preprocessor.apply(ratings_df, movies_df)
 
         # Feature engineering
-        feature_eng = LinerRegressionFeatureEng()
+        feature_eng = LinearRegressionFeatureEng()
         feature_eng.fit(processed_df)
         X, y = feature_eng.transform(processed_df)
 

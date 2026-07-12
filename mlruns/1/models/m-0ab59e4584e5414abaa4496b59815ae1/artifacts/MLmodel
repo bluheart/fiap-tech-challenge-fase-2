@@ -1,0 +1,15 @@
+artifact_path: /workspaces/fiap-tech-challenge-fase-2/mlruns/1/models/m-0ab59e4584e5414abaa4496b59815ae1/artifacts
+flavors:
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.8.0
+    skops_trusted_types: null
+mlflow_version: 3.12.0
+model_id: m-0ab59e4584e5414abaa4496b59815ae1
+model_size_bytes: 211214
+model_uuid: m-0ab59e4584e5414abaa4496b59815ae1
+prompts: null
+run_id: 61ea6a03e7a8419faeff96662aa7f4e0
+utc_time_created: '2026-07-12 19:57:31.281170'
