@@ -3,18 +3,22 @@ preprocessors:
   gradient_boosting: true
   linear_regression: true
   random_forest: true
+  multi_layer_perceptron: true
+
 
 # Feature engineering
 features_eng:
   gradient_boosting: true
   linear_regression: true
   random_forest: true
+  multi_layer_perceptron: true
 
 # Model training
 models:
   gradient_boosting: true
   linear_regression: true
   random_forest: true
+  multi_layer_perceptron: true
 
 # Training parameters
 train:
@@ -53,3 +57,13 @@ gradient_boosting_params:
   subsample: 0.8
   max_features: 0.8
   random_state: 42
+
+multi_layer_perceptron_params:
+  hidden_dims: [256, 128, 64]
+  dropout_rate: 0.3
+  batch_size: 256
+  epochs: 100
+  learning_rate: 0.001
+  weight_decay: 0.00001
+  patience: 10
+  device: "cpu"

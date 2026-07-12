@@ -23,6 +23,7 @@ dev = [
 
 [tool.taskipy.tasks]
 test = "pytest tests/ -v"
+repro = "dvc repro"
 
 [[tool.uv.index]]
 name = "pytorch-cpu"

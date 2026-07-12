@@ -68,6 +68,7 @@ def create_model_with_factory(name: str, params: Dict[str, Any]):
         "linear_regression": "linear_regression",
         "random_forest": "random_forest",
         "gradient_boosting": "gradient_boosting",
+        "multi_layer_perceptron": "multi_layer_perceptron",
     }
 
     model_type = name_mapping.get(name)

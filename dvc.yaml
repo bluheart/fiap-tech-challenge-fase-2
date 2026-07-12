@@ -4,6 +4,7 @@ stages:
     deps:
       - src/pipeline/preprocess.py
       - src/features/baseline_preprocessor/
+      - src/features/preprocessor.py
       - data/raw/ratings.csv
       - data/raw/movies.csv
     params:
@@ -13,21 +14,25 @@ stages:
       - data/processed/gradient_boosting_data.csv
       - data/processed/linear_regression_data.csv
       - data/processed/random_forest_data.csv
+      - data/processed/multi_layer_perceptron_data.csv
 
   feature_engineering:
     cmd: python src/pipeline/feature_eng.py
     deps:
       - src/pipeline/feature_eng.py
       - src/features/baseline_feature_engineering/
+      - src/features/feature_engineering.py
       - data/processed/gradient_boosting_data.csv
       - data/processed/linear_regression_data.csv
       - data/processed/random_forest_data.csv
+      - data/processed/multi_layer_perceptron_data.csv
     params:
       - features_eng
     outs:
       - data/features/gradient_boosting_features.csv
       - data/features/linear_regression_features.csv
       - data/features/random_forest_features.csv
+      - data/features/multi_layer_perceptron_features.csv
   
   train:
     cmd: python src/pipeline/train.py
@@ -38,6 +43,7 @@ stages:
       - data/features/gradient_boosting_features.csv
       - data/features/linear_regression_features.csv
       - data/features/random_forest_features.csv
+      - data/features/multi_layer_perceptron_features.csv
     params:
       - models
       - train
@@ -45,10 +51,12 @@ stages:
       - linear_regression_params
       - random_forest_params
       - gradient_boosting_params
+      - multi_layer_perceptron_params
     outs:
       - models/gradient_boosting_model.pkl
       - models/linear_regression_model.pkl
       - models/random_forest_model.pkl
+      - models/multi_layer_perceptron_model.pkl
     metrics:
       - metrics/train_metrics.json
   
@@ -59,9 +67,11 @@ stages:
       - models/gradient_boosting_model.pkl
       - models/linear_regression_model.pkl
       - models/random_forest_model.pkl
+      - models/multi_layer_perceptron_model.pkl
       - data/features/gradient_boosting_features.csv
       - data/features/linear_regression_features.csv
       - data/features/random_forest_features.csv
+      - data/features/multi_layer_perceptron_features.csv
     params:
       - models
       - evaluate
@@ -69,5 +79,6 @@ stages:
       - linear_regression_params
       - random_forest_params
       - gradient_boosting_params
+      - multi_layer_perceptron_params
     metrics:
       - metrics/evaluation_metrics.json

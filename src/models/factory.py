@@ -6,10 +6,11 @@ from .base import (
     RandomForestModel,
     GradientBoostingModel,
 )
+from .mlp import MLPModel
 
 
 class ModelFactory:
-    """Factory class to create and manage different types of regression models.
+    """Factory class to create and manage different types of models.
 
     This class implements the Factory design pattern, providing a centralized
     way to create model instances based on type strings. It maintains a registry
@@ -30,6 +31,7 @@ class ModelFactory:
         "linear_regression": LinearRegressionModel,
         "random_forest": RandomForestModel,
         "gradient_boosting": GradientBoostingModel,
+        "multi_layer_perceptron": MLPModel,
     }
 
     @classmethod
