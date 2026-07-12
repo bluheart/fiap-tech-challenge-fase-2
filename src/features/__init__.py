@@ -8,6 +8,8 @@ from .baseline_preprocessor import (
     RandomForestPreprocessor,
     LinearRegressionPreprocessor,
 )
+from .preprocessor import MLPModelPreprocessor
+from .feature_engineering import MLPFeatureEngineer
 # from .feature_engineering import *
 # from .preprocessor import *
 
@@ -15,7 +17,9 @@ __all__ = [
     "GradientBoostingFeatureEng",
     "RandomForestFeatureEng",
     "LinearRegressionFeatureEng",
+    "MLPFeatureEngineer",
     "GradientBoostingPreprocessor",
     "RandomForestPreprocessor",
     "LinearRegressionPreprocessor",
+    "MLPModelPreprocessor",
 ]

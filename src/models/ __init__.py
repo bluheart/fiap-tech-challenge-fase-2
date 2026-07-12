@@ -6,9 +6,11 @@ from .base import (
     GradientBoostingModel,
 )
 from .factory import ModelFactory
+from .mlp import MLPModel
 
 __all__ = [
     "ModelBase",
+    "MLPModel",
     "LinearRegressionModel",
     "RandomForestModel",
     "GradientBoostingModel",
