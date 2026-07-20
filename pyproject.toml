@@ -24,6 +24,7 @@ dev = [
 [tool.taskipy.tasks]
 test = "pytest tests/ -v"
 repro = "dvc repro"
+validate = "python scripts/validate_env.py"
 
 [[tool.uv.index]]
 name = "pytorch-cpu"
