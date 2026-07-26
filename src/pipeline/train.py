@@ -150,7 +150,7 @@ def log_model_to_mlflow(
         try:
             mlflow.pyfunc.log_model(
                 python_model=model.get_model(),
-                artifact_path=f"sklearn_models/{name}",
+                name=f"{name}",
                 registered_model_name=f"{name.replace('_', '-')}_model",
             )
             print(f"Logged {name} model as sklearn model to MLflow")

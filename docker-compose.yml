@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  ml-pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fiap-ml-pipeline:latest
+    container_name: ml-pipeline
+    volumes:
+      # Mount data and models for persistence
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./metrics:/app/metrics
+      - ./logs:/app/logs
+      - ./mlruns:/app/mlruns
+      - ./mlflow.db:/app/mlflow.db
+    environment:
+      - MLFLOW_TRACKING_URI=mlruns
+      - PYTHONUNBUFFERED=1
+    command: ["pipeline", "repro"]
+    # Uncomment for MLflow UI access
+    # ports:
+    #   - "5000:5000"
+
+  mlflow-ui:
+    image: fiap-ml-pipeline:latest
+    container_name: mlflow-ui
+    volumes:
+      - ./mlruns:/app/mlruns
+      - ./mlflow.db:/app/mlflow.db
+    ports:
+      - "5000:5000"
+    command: ["mlflow"]
+    environment:
+      - MLFLOW_TRACKING_URI=mlruns
