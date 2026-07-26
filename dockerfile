@@ -42,17 +42,78 @@ WORKDIR /app
 COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Copy project files (including .git for DVC)
+# Copy project files
 COPY . .
 
 # Initialize git repository if not present (for DVC)
 RUN if [ ! -d ".git" ]; then \
         git init && \
-        git add . && \
         git config user.email "container@local" && \
         git config user.name "Container User" && \
-        git commit -m "Initial commit for DVC" || true; \
+        echo "Initializing Git repository..."; \
     fi
+
+# Create .gitignore to exclude data files from Git
+RUN echo "# Data files (tracked by DVC)\n\
+data/raw/*.csv\n\
+data/processed/*.csv\n\
+data/features/*.csv\n\
+!data/raw/*.dvc\n\
+\n\
+# Models (tracked by DVC)\n\
+models/*.pkl\n\
+\n\
+# MLflow\n\
+mlruns/\n\
+mlflow.db\n\
+\n\
+# Logs\n\
+logs/\n\
+*.log\n\
+" > .gitignore
+
+# Fix DVC setup - remove files from Git and add to DVC
+RUN echo '#!/bin/bash\n\
+set -e\n\
+\n\
+echo "Setting up DVC in container..."\n\
+\n\
+# Initialize DVC without SCM integration (--no-scm) since we want to use it with Git\n\
+if [ ! -d ".dvc" ]; then\n\
+    dvc init --quiet\n\
+fi\n\
+\n\
+# Remove CSV files from Git tracking if they exist\n\
+if [ -f "data/raw/ratings.csv" ] && git ls-files --error-unmatch data/raw/ratings.csv 2>/dev/null; then\n\
+    echo "Removing data/raw/ratings.csv from Git..."\n\
+    git rm --cached data/raw/ratings.csv\n\
+fi\n\
+\n\
+if [ -f "data/raw/movies.csv" ] && git ls-files --error-unmatch data/raw/movies.csv 2>/dev/null; then\n\
+    echo "Removing data/raw/movies.csv from Git..."\n\
+    git rm --cached data/raw/movies.csv\n\
+fi\n\
+\n\
+# Add .gitignore to Git\n\
+git add .gitignore\n\
+\n\
+# Commit changes\n\
+git add . 2>/dev/null || true\n\
+git commit -m "Initial setup for DVC" 2>/dev/null || echo "No changes to commit"\n\
+\n\
+# Create DVC files for raw data if they don'\''t exist and CSV files are present\n\
+if [ -f "data/raw/ratings.csv" ] && [ ! -f "data/raw/ratings.csv.dvc" ]; then\n\
+    echo "Adding ratings.csv to DVC..."\n\
+    dvc add data/raw/ratings.csv --no-commit\n\
+fi\n\
+\n\
+if [ -f "data/raw/movies.csv" ] && [ ! -f "data/raw/movies.csv.dvc" ]; then\n\
+    echo "Adding movies.csv to DVC..."\n\
+    dvc add data/raw/movies.csv --no-commit\n\
+fi\n\
+\n\
+echo "DVC setup complete!"\n\
+' > /app/setup_dvc.sh && chmod +x /app/setup_dvc.sh
 
 # Create necessary directories
 RUN mkdir -p data/raw data/processed data/features models logs metrics
@@ -66,33 +127,21 @@ ENV DVC_NO_ANALYTICS=true
 RUN echo '#!/bin/bash\n\
 set -e\n\
 \n\
-echo "Starting DVC pipeline..."\n\
+echo "Starting DVC pipeline in container..."\n\
 echo "Current directory: $(pwd)"\n\
-echo "Files in current directory:"\n\
-ls -la\n\
+echo "Checking raw data files..."\n\
+ls -la data/raw/ 2>/dev/null || echo "No raw data found"\n\
 \n\
-# Check if DVC is initialized\n\
+# Run DVC setup if needed\n\
 if [ ! -f ".dvc/config" ]; then\n\
-    echo "Initializing DVC..."\n\
-    dvc init --no-scm --quiet\n\
-fi\n\
-\n\
-# Check if .dvc files exist for raw data\n\
-if [ ! -f "data/raw/movies.csv.dvc" ] || [ ! -f "data/raw/ratings.csv.dvc" ]; then\n\
-    echo "DVC files not found. Creating them..."\n\
-    # Create DVC files for raw data if they exist\n\
-    if [ -f "data/raw/movies.csv" ]; then\n\
-        dvc add data/raw/movies.csv --no-commit\n\
-    fi\n\
-    if [ -f "data/raw/ratings.csv" ]; then\n\
-        dvc add data/raw/ratings.csv --no-commit\n\
-    fi\n\
+    echo "Running DVC setup..."\n\
+    /app/setup_dvc.sh\n\
 fi\n\
 \n\
 # Handle different commands\n\
 case "$1" in\n\
     repro)\n\
-        echo "Running: dvc repro"\n\
+        echo "Running: dvc repro --force"\n\
         dvc repro --force\n\
         ;;\n\
     pull)\n\
@@ -103,17 +152,17 @@ case "$1" in\n\
         echo "Running: dvc status"\n\
         dvc status\n\
         ;;\n\
-    remote)\n\
-        echo "Setting up DVC remote..."\n\
-        dvc remote add -d local ./storage\n\
-        mkdir -p storage\n\
+    setup)\n\
+        echo "Running DVC setup..."\n\
+        /app/setup_dvc.sh\n\
         ;;\n\
-    list)\n\
-        echo "Listing DVC tracked files:"\n\
-        dvc list . --dvc-only\n\
+    clean)\n\
+        echo "Cleaning DVC cache and outputs..."\n\
+        dvc gc --workspace --force\n\
+        dvc repro --force\n\
         ;;\n\
     *)\n\
-        echo "Running default: dvc repro"\n\
+        echo "Running default: dvc repro --force"\n\
         dvc repro --force\n\
         ;;\n\
 esac\n\
@@ -121,7 +170,7 @@ esac\n\
 # Display results\n\
 echo "Pipeline execution completed!"\n\
 echo "Output files:"\n\
-find data/processed data/features models -type f 2>/dev/null || echo "No output files found"\n\
+find data/processed data/features models -type f 2>/dev/null | head -10 || echo "No output files found"\n\
 ' > /app/run_pipeline.sh && chmod +x /app/run_pipeline.sh
 
 # Create entrypoint script
