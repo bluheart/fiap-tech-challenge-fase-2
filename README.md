@@ -49,6 +49,7 @@ venv\Scripts\activate
 # Linux/Mac:
 source venv/bin/activate
 
+# roda a pipeline completa no dvc
 dvc repro
 
 #exemplo
