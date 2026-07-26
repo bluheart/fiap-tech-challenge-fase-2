@@ -63,7 +63,10 @@ python src/predict.py --ratings data/raw/ratings.csv --movies data/raw/movies.cs
 git clone https://github.com/bluheart/fiap-tech-challenge-fase-2.git
 cd fiap-tech-challenge-fase-2
 
-# Suba toda a stack
+# crie o container, assim é melhor pra saber quando o modelo esta pronto para uso
+docker-compose up
+
+# se parar depois que terminar o treinamento, ligue o container de novo com
 docker-compose up -d
 
 # script de predição, exemplo
