@@ -1,4 +1,4 @@
-# API com Rede Neural para Previsão de Churn
+# Rede Neural para sistemas de recomendação
 
 [![Python](https://img.shields.io/badge/Python-3.13+-blue.svg)](https://python.org)
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://docker.com)
