@@ -18,17 +18,25 @@ htmlcov/
 dmypy.json
 *.log
 
-# DVC and MLflow
+# DVC cache and temp (but keep DVC files)
 .dvc/cache/
 .dvc/tmp/
+.dvc/updater
+.dvc/plots
+!dvc.yaml
+!dvc.lock
+!data/**/*.dvc
+
+# MLflow
 mlruns/
 mlflow.db
-logs/
 
-# Data directories (will be mounted or pulled)
+# Output directories (will be created)
 data/processed/
 data/features/
 models/
+metrics/
+logs/
 
 # Jupyter notebooks
 notebooks/
@@ -39,15 +47,6 @@ notebooks/
 .idea/
 *.swp
 *.swo
-
-# Git
-.git/
-.gitignore
-
-# Docker
-Dockerfile
-.dockerignore
-docker-compose.yml
 
 # OS
 .DS_Store
