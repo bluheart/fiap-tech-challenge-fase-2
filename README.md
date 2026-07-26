@@ -9,9 +9,6 @@
 - [Sobre o Projeto](#sobre-o-projeto)
 - [Documentação](#documentação)
 - [Instalação Local](#instalação-local)
-- 
-- 
--
 
 ---
 
@@ -19,7 +16,7 @@
 
 Esta é a **Tech Challenge** da fase 2 - Big Data Architecture da Pós Tech em Engenharia de Machine Learning da FIAP.
 
-O projeto se trata de uma API para inferência de modelos ML, com tema central: 
+O projeto se trata de um modelo de ML, com tema central: 
 Rede Neural para Previsão de Notas em filmes
 - 🔥**Multi-Layer Perceptron** com PyTorch para inferência
 
