@@ -263,9 +263,9 @@ batch_size = 256
 | Attribute | Value |
 |-----------|-------|
 | **Model Version** | v1.0.0 |
-| **Training Date** | January 2026 |
-| **Last Evaluation** | March 2026 |
-| **Training Data** | MovieLens dataset (2024-2025) |
+| **Training Date** | July 2026 |
+| **Last Evaluation** | July 2026 |
+| **Training Data** | MovieLens dataset |
 | **Maintenance Schedule** | Quarterly retraining |
 | **Monitoring** | Performance drift tracking |
 
